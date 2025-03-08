@@ -1,0 +1,7 @@
+fn sayHello() {
+    printf("Hello from Umka!\n")
+}
+
+fn calculate(value: int, other: int, blub: real): (int, bool, real) {
+    return value * 4, true, 1.0
+}
