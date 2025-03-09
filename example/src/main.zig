@@ -40,8 +40,9 @@ pub fn main() !void {
 
     var radians = umka.Function.new(null, "radians");
     try radians.get(instance);
-    for(0..(360 / 15) + 1) |index| {
-        const degrees: i64 = @intCast(index * 15);
+    const degree_step = 45;
+    for(0..(360 / degree_step) + 1) |index| {
+        const degrees: i64 = @intCast(index * degree_step);
         try radians.setParameter(0, .{ .int = degrees });
         try radians.call();
         print("{d:>4} deg = {d:.3} rad\n", .{ degrees, radians.getResult().real });
