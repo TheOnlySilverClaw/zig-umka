@@ -54,12 +54,6 @@ pub fn main() !void {
     try neighbors.setParameter(0, .{ .int = 4 });
     const neighboes_result = try neighbors.call();
     print("neighbors: {d} {d}\n", .{ neighboes_result.lower, neighboes_result.higher });
-
-    var next_three = umka.Function([3]i64).new(null, "nextThree");
-    try next_three.get(instance);
-    try next_three.setParameter(0, .{ .int = 2 });
-    const next_three_result = try next_three.call();
-    print("next three: {d}\n", .{ next_three_result });
 }
 
 fn readFileCString(file_name: []const u8, buffer: []u8) ![*:0]u8 {

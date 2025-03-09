@@ -15,7 +15,3 @@ fn radians(degrees: int): real {
 fn neighbors(value: int): (int, int) {
     return value - 1, value + 1
 }
-
-fn nextThree(value: int): [3]int {
-    return [3]int { value + 1, value + 2, value + 3 }
-}
