@@ -120,4 +120,18 @@ pub const Function = struct {
         const param = try binding.getParam(self.context.params, index);
         param.* = value;
     }
+
+    pub fn setParameters(self: *Function, values: []const binding.StackSlot) !void {
+
+        const params = self.context.params;
+        const layout = binding.getParamLayout(params);
+        if(values.len > layout.num_params - layout.num_result_params - 1) {
+            return error.InvalidParamIndex;
+        }
+        const first_slot_index = layout.firstSlotIndex();
+        for(0..values.len) |index| {
+            const slot_index: usize = @intCast(first_slot_index[index + 1]);
+            params[slot_index] = values[index];
+        }
+    }
 };
