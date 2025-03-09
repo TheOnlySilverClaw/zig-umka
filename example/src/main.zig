@@ -34,8 +34,9 @@ pub fn main() !void {
     try add.get(instance);
     try add.setParameters(&.{ .{ .int = 4 }, .{ .int = 6 } });
     try add.call();
-    const add_result = add.getResult().int;
-    print("added: {d}\n", .{ add_result });
+    try add.setParameter(0, add.getResult().*);
+    try add.call();
+    print("added: {d}\n", .{ add.getResult().int });
 
     var radians = umka.Function.new(null, "radians");
     try radians.get(instance);
@@ -43,8 +44,7 @@ pub fn main() !void {
         const degrees: i64 = @intCast(index * 15);
         try radians.setParameter(0, .{ .int = degrees });
         try radians.call();
-        const radians_result = radians.getResult().real;
-        print("{d:>4} deg = {d:.3} rad\n", .{ degrees, radians_result });
+        print("{d:>4} deg = {d:.3} rad\n", .{ degrees, radians.getResult().real });
     }
 
     const Neighbors = extern struct {
