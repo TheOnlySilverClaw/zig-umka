@@ -33,10 +33,10 @@ pub fn main() !void {
     var add: umka.FuncContext = undefined;
     try instance.getFunc(null, "add", &add);
     {        
-        var a = umka.getParam(add.params, 0).?;
+        var a = try umka.getParam(add.params, 0);
         a.int = 7;
 
-        var b = umka.getParam(add.params, 1).?;
+        var b = try umka.getParam(add.params, 1);
         b.int = 13;
 
         try instance.call(&add);
@@ -47,7 +47,7 @@ pub fn main() !void {
     var radians: umka.FuncContext = undefined;
     try instance.getFunc(null, "radians", &radians);
     {
-        var degrees = umka.getParam(radians.params, 0).?;
+        var degrees = try umka.getParam(radians.params, 0);
         degrees.int = 45;
 
         try instance.call(&radians);
@@ -58,7 +58,7 @@ pub fn main() !void {
     var neighbors: umka.FuncContext = undefined;
     try instance.getFunc(null, "neighbors", &neighbors);
     {
-        var value = umka.getParam(neighbors.params, 0).?;
+        var value = try umka.getParam(neighbors.params, 0);
         value.int = 4;
 
         var result: [2]i64 = .{ 0, 0 };
@@ -72,7 +72,7 @@ pub fn main() !void {
     var next_three: umka.FuncContext = undefined;
     try instance.getFunc(null, "nextThree", &next_three);
     {
-        var value = umka.getParam(next_three.params, 0).?;
+        var value = try umka.getParam(next_three.params, 0);
         value.int = 3;
 
         var result: [3]i64 = undefined;

@@ -139,12 +139,12 @@ pub fn alloc() *Instance {
 
 pub const getVersion = umkaGetVersion;
 
-pub fn getParam(params: [*]StackSlot, index: c_int) ?*StackSlot {
+pub fn getParam(params: [*]StackSlot, index: c_int) error{InvalidParamIndex}!*StackSlot {
 
     const layout_slot = (params - 4)[0];
     const layout: *const ExternalCallParamLayout = @ptrCast(@alignCast(layout_slot.ptr));
     if(index < 0 or index >= layout.num_params - layout.num_result_params - 1) {
-        return null;
+        return error.InvalidParamIndex;
     }
 
     const slot_offset: usize = @intCast(index + 1);
