@@ -28,18 +28,60 @@ pub fn main() !void {
             _ = instance.call(&sayHello);
         }
 
-        var calculate: umka.FuncContext = undefined;
-        if(instance.getFunc(null, "calculate", &calculate)) {
+        var add: umka.FuncContext = undefined;
+        if(instance.getFunc(null, "add", &add)) {
             
-            var a_param = umka.getParam(calculate.params, 0);
-            a_param.?.int = 7;
+            var a = umka.getParam(add.params, 0).?;
+            a.int = 7;
 
-            var b_param = umka.getParam(calculate.params, 1);
-            b_param.?.int = 11;
+            var b = umka.getParam(add.params, 1).?;
+            b.int = 13;
 
-            if(instance.call(&calculate)) {
-                const result = umka.getResult(calculate.params, calculate.result).int;
-                print("result from Umka: {d}\n", .{ result });
+            if(instance.call(&add)) {
+                const result = umka.getResult(add.params, add.result);
+                print("added: {d}\n", .{ result.int });
+            }
+        }
+
+        var radians: umka.FuncContext = undefined;
+        if(instance.getFunc(null, "radians", &radians)) {
+
+            var degrees = umka.getParam(radians.params, 0).?;
+            degrees.int = 45;
+
+            if(instance.call(&radians)) {
+                const result = umka.getResult(radians.params, radians.result);
+                print("radians: {d:.5}\n", .{ result.real });
+            }
+        }
+
+        var neighbors: umka.FuncContext = undefined;
+        if(instance.getFunc(null, "neighbors", &neighbors)) {
+
+            var value = umka.getParam(neighbors.params, 0).?;
+            value.int = 4;
+
+            if(instance.call(&neighbors)) {
+                const result = umka.getResult(neighbors.params, neighbors.result);
+                print("neighbors: {d}\n", .{ result.int });
+            } else {
+                const err = instance.getError();
+                print("error: {s} {s}\n", .{ err.msg, err.fn_name });
+            }
+        }
+
+        var next_three: umka.FuncContext = undefined;
+        if(instance.getFunc(null, "nextThree", &next_three)) {
+
+            var value = umka.getParam(next_three.params, 0).?;
+            value.int = 3;
+
+            if(instance.call(&next_three)) {
+                const result = umka.getResult(next_three.params, next_three.result);
+                print("next three: {d}\n", .{ result.int });
+            } else {
+                const err = instance.getError();
+                print("error: {s} {s}\n", .{ err.msg, err.fn_name });
             }
         }
 

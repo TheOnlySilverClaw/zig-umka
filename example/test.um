@@ -1,7 +1,21 @@
+import "std.um"
+
 fn sayHello() {
     printf("Hello from Umka!\n")
 }
 
-fn calculate(a: int, b: int): int {
-    return a * b
+fn add(a: int, b: int): int {
+    return a + b
+}
+
+fn radians(degrees: int): real {
+    return degrees * std::pi / 180
+}
+
+fn neighbors(value: int): (int, int) {
+    return value - 1, value + 1
+}
+
+fn nextThree(value: int): [3]int {
+    return [3]int { value + 1, value + 2, value + 3 }
 }
