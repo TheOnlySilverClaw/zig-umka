@@ -38,13 +38,15 @@ pub fn main() !void {
     const add_result = add.getResult().int;
     print("added: {d}\n", .{ add_result });
 
-
     var radians = umka.Function.new(null, "radians");
     try radians.get(instance);
-    try radians.setParameter(0, .{ .int = 45 });
-    try radians.call();
-    const radians_result = radians.getResult().real;
-    print("radians: {d:.5}\n", .{ radians_result });
+    for(0..(360 / 15) + 1) |index| {
+        const degrees: i64 = @intCast(index * 15);
+        try radians.setParameter(0, .{ .int = degrees });
+        try radians.call();
+        const radians_result = radians.getResult().real;
+        print("{d:>4} deg = {d:.3} rad\n", .{ degrees, radians_result });
+    }
 
     const Neighbors = extern struct {
         lower: i64,
