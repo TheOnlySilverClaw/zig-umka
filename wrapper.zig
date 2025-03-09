@@ -149,23 +149,8 @@ pub fn Function(R: type) type {
         }
 
         pub fn setParameter(self: *Self, index: c_int, value: binding.StackSlot) !void {
-            const param = try getParam(self.context.params, index);
+            const param = try binding.getParam(self.context.params, index);
             param.* = value;
         }
     };
-}
-
-
-pub fn getParam(params: [*]binding.StackSlot, index: c_int) error{InvalidParamIndex}!*binding.StackSlot {
-
-    const layout_slot = (params - 4)[0];
-    const layout: *const binding.ExternalCallParamLayout = @ptrCast(@alignCast(layout_slot.ptr));
-    if(index < 0 or index >= layout.num_params - layout.num_result_params - 1) {
-        return error.InvalidParamIndex;
-    }
-
-    const slot_offset: usize = @intCast(index + 1);
-    const first_slot_index = layout.firstSlotIndex();
-    const slot_index: usize = @intCast((first_slot_index[slot_offset]));
-    return &params[slot_index];
 }
