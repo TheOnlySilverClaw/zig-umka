@@ -74,9 +74,9 @@ pub const Instance = opaque {
         args: [][*:0]const u8,
         file_system_enabled: bool,
         impl_libs_enabled: bool,
-        warning_callback: ?*WarningCallback) bool {
+        warning_callback: ?*WarningCallback) error{Init}!void {
         
-        return umkaInit(
+        const success = umkaInit(
             self,
             file_name,
             source_string,
@@ -86,17 +86,23 @@ pub const Instance = opaque {
             args.ptr,
             if(file_system_enabled) 1 else 0,
             if(impl_libs_enabled) 1 else 0,
-            warning_callback) == 1;
+            warning_callback);
+        if(success != 1) return error.Init;
     }
 
-    pub fn compile(self: *Instance) bool {
-        return umkaCompile(self) == 1;
+    pub fn compile(self: *Instance) error{Compile}!void {
+        const success = umkaCompile(self);
+        if(success != 1) return error.Compile;
     }
 
-    pub const run = umkaRun;
+    pub fn run(self: *Instance) error{Run}!void {
+        const code = umkaRun(self);
+        if(code != 0) return error.Run;
+    }
 
-    pub fn call(self: *Instance, context: *FuncContext) bool {
-        return umkaCall(self, context) == 0;
+    pub fn call(self: *Instance, context: *FuncContext) error{Call}!void {
+        const code = umkaCall(self, context);
+        if(code != 0) return error.Call;
     }
 
     pub fn free(self: *Instance) void {
@@ -109,16 +115,19 @@ pub const Instance = opaque {
 
     pub const assembly = umkaAsm;
 
-    pub fn addModule(self: *Instance, file_name: [*:0]const u8, source_string: [*:0]const u8) bool {
-        return umkaAddModule(self, file_name, source_string) == 1;
+    pub fn addModule(self: *Instance, file_name: [*:0]const u8, source_string: [*:0]const u8) error{AddModule}!void {
+        const success = umkaAddModule(self, file_name, source_string);
+        if(success != 1) return error.AddModule;
     }
 
-    pub fn addFunc(self: *Instance, name: [*:0]const u8, func: ExternFunc) bool {
-        return umkaAddFunc(self, name, func) == 1;
+    pub fn addFunc(self: *Instance, name: [*:0]const u8, func: ExternFunc) error{AddFunc}!void {
+        const success = umkaAddFunc(self, name, func);
+        if(success != 1) return error.AddFunc;
     }
 
-    pub fn getFunc(self: *Instance, module_name: ?[*:0]const u8, fn_name: [*:0]const u8, context: *FuncContext) bool {
-        return umkaGetFunc(self, module_name, fn_name, context) == 1;
+    pub fn getFunc(self: *Instance, module_name: ?[*:0]const u8, fn_name: [*:0]const u8, context: *FuncContext) error{GetFunc}!void {
+        const success = umkaGetFunc(self, module_name, fn_name, context);
+        if(success != 1) return error.GetFunc;
     }
 
     pub const getError = umkaGetError;
