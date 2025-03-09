@@ -61,9 +61,12 @@ pub fn main() !void {
             var value = umka.getParam(neighbors.params, 0).?;
             value.int = 4;
 
+            var result: [2]i64 = .{ 0, 0 };
+            var result_param = &neighbors.params[0];
+            result_param.ptr = @ptrCast(&result);
+
             if(instance.call(&neighbors)) {
-                const result = umka.getResult(neighbors.params, neighbors.result);
-                print("neighbors: {d}\n", .{ result.int });
+                print("neighbors: {d} {d}\n", .{ result[0], result[1] });
             } else {
                 const err = instance.getError();
                 print("error: {s} {s}\n", .{ err.msg, err.fn_name });
@@ -76,9 +79,12 @@ pub fn main() !void {
             var value = umka.getParam(next_three.params, 0).?;
             value.int = 3;
 
+            var result: [3]i64 = undefined;
+            var result_param = &next_three.params[0];
+            result_param.ptr = @ptrCast(&result);
+
             if(instance.call(&next_three)) {
-                const result = umka.getResult(next_three.params, next_three.result);
-                print("next three: {d}\n", .{ result.int });
+                print("next three: {d}\n", .{ result });
             } else {
                 const err = instance.getError();
                 print("error: {s} {s}\n", .{ err.msg, err.fn_name });
