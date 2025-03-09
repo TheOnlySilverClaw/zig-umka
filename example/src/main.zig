@@ -32,13 +32,13 @@ pub fn main() !void {
         if(instance.getFunc(null, "calculate", &calculate)) {
             
             var a_param = umka.getParam(calculate.params, 0);
-            a_param.?.int = 5;
+            a_param.?.int = 7;
 
             var b_param = umka.getParam(calculate.params, 1);
-            b_param.?.int = 7;
+            b_param.?.int = 11;
 
             if(instance.call(&calculate)) {
-                const result = calculate.result.int;
+                const result = umka.getResult(calculate.params, calculate.result).int;
                 print("result from Umka: {d}\n", .{ result });
             }
         }

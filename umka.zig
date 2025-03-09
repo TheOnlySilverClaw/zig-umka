@@ -137,12 +137,25 @@ pub fn getParam(params: [*]StackSlot, index: c_int) ?*StackSlot {
     if(index < 0 or index >= layout.num_params - layout.num_result_params - 1) {
         return null;
     }
-    @import("std").debug.print("layout {any}\n", .{ layout.* });
 
     const slot_offset: usize = @intCast(index + 1);
     const first_slot_index = layout.firstSlotIndex();
     const slot_index: usize = @intCast((first_slot_index[slot_offset]));
     return &params[slot_index];
+}
+
+pub fn getResult(params: [*]StackSlot, result: *StackSlot) *StackSlot {
+
+    const layout_slot = (params - 4)[0];
+    const layout: *const ExternalCallParamLayout = @ptrCast(@alignCast(layout_slot.ptr));
+    if(layout.num_result_params == 1) {
+        const slot_offset: usize = @intCast(layout.num_params - 1);
+        const first_slot_index = layout.firstSlotIndex();
+        const slot_index: usize = @intCast((first_slot_index[slot_offset]));
+        result.ptr = params[slot_index].ptr;
+    }
+
+    return result;
 }
 
 extern fn umkaAlloc() *Instance;
