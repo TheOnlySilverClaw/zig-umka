@@ -15,9 +15,9 @@ pub fn main() !void {
     const source = try readFileCString(file_name, &buffer);
     
     const stack_size = 1024 * 4;
-    var instance: *umka.Instance = @ptrCast(@alignCast(umka.alloc()));
-
-    try instance.init(file_name, source, stack_size, &.{}, true, true, null);
+    const instance = try umka.Instance.alloc(file_name, source, stack_size, &.{}, true, true, null);
+    defer instance.free();
+    
     assert(instance.alive());
 
     instance.compile() catch {
@@ -26,64 +26,40 @@ pub fn main() !void {
         return;
     };
 
-    var sayHello: umka.FuncContext = undefined;
-    try instance.getFunc(null, "sayHello", &sayHello);
-    try instance.call(&sayHello);
+    var sayHello = umka.Function(void).new(null, "sayHello");
+    try sayHello.get(instance);
+    try sayHello.call();
 
-    var add: umka.FuncContext = undefined;
-    try instance.getFunc(null, "add", &add);
-    {        
-        var a = try umka.getParam(add.params, 0);
-        a.int = 7;
+    var add = umka.Function(i64).new(null, "add");
+    try add.get(instance);
+    try add.setParameter(0, .{ .int = 4 });
+    try add.setParameter(1, .{ .int = 6 });
+    const add_result = try add.call();
+    print("added: {d}\n", .{ add_result });
 
-        var b = try umka.getParam(add.params, 1);
-        b.int = 13;
 
-        try instance.call(&add);
-        const result = umka.getResult(add.params, add.result);
-        print("added: {d}\n", .{ result.int });
-    }
+    var radians = umka.Function(f64).new(null, "radians");
+    try radians.get(instance);
+    try radians.setParameter(0, .{ .int = 45 });
+    const radians_result = try radians.call();
+    print("radians: {d:.5}\n", .{ radians_result });
 
-    var radians: umka.FuncContext = undefined;
-    try instance.getFunc(null, "radians", &radians);
-    {
-        var degrees = try umka.getParam(radians.params, 0);
-        degrees.int = 45;
+    const Neighbors = extern struct {
+        lower: i64,
+        higher: i64
+    };
 
-        try instance.call(&radians);
-        const result = umka.getResult(radians.params, radians.result);
-        print("radians: {d:.5}\n", .{ result.real });
-    }
+    var neighbors = umka.Function(Neighbors).new(null, "neighbors");
+    try neighbors.get(instance);
+    try neighbors.setParameter(0, .{ .int = 4 });
+    const neighboes_result = try neighbors.call();
+    print("neighbors: {d} {d}\n", .{ neighboes_result.lower, neighboes_result.higher });
 
-    var neighbors: umka.FuncContext = undefined;
-    try instance.getFunc(null, "neighbors", &neighbors);
-    {
-        var value = try umka.getParam(neighbors.params, 0);
-        value.int = 4;
-
-        var result: [2]i64 = .{ 0, 0 };
-        var result_param = &neighbors.params[0];
-        result_param.ptr = @ptrCast(&result);
-
-        try instance.call(&neighbors);
-        print("neighbors: {d} {d}\n", .{ result[0], result[1] });
-    }
-
-    var next_three: umka.FuncContext = undefined;
-    try instance.getFunc(null, "nextThree", &next_three);
-    {
-        var value = try umka.getParam(next_three.params, 0);
-        value.int = 3;
-
-        var result: [3]i64 = undefined;
-        var result_param = &next_three.params[0];
-        result_param.ptr = @ptrCast(&result);
-
-        try instance.call(&next_three);
-        print("next three: {d}\n", .{ result });
-    }
-
-    instance.free();
+    var next_three = umka.Function([3]i64).new(null, "nextThree");
+    try next_three.get(instance);
+    try next_three.setParameter(0, .{ .int = 2 });
+    const next_three_result = try next_three.call();
+    print("next three: {d}\n", .{ next_three_result });
 }
 
 fn readFileCString(file_name: []const u8, buffer: []u8) ![*:0]u8 {

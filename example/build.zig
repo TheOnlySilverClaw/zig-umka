@@ -12,7 +12,7 @@ pub fn build(b: *std.Build) void {
     });
 
     const umka_dependency = b.dependency("umka", .{});
-    exe_module.addImport("umka", umka_dependency.module("umka"));
+    exe_module.addImport("umka", umka_dependency.module("wrapper"));
 
     const exe = b.addExecutable(.{
         .name = "example",

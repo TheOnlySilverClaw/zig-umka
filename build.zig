@@ -10,4 +10,10 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize
     });
+
+    _ = b.addModule("wrapper",.{
+        .root_source_file = b.path("wrapper.zig"),
+        .target = target,
+        .optimize = optimize
+    });
 }
