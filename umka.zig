@@ -1,3 +1,6 @@
+const std = @import("std");
+const FlexibleArrayType = std.zig.c_translation.FlexibleArrayType;
+
 pub const StackSlot = extern union {
     int: i64,
     uint: u64,
@@ -48,10 +51,17 @@ pub const Error = extern struct {
 pub const WarningCallback = fn(warning: *Error) callconv(.C) void;
 
 pub const ExternalCallParamLayout = extern struct {
-    num_params: i64,
-    num_result_params: i64,
-    num_param_slots: i64,
-    first_slot_index: [*]i64
+    num_params: i64 align(8) = @import("std").mem.zeroes(i64),
+    num_result_params: i64 = @import("std").mem.zeroes(i64),
+    num_param_slots: i64 = @import("std").mem.zeroes(i64),
+    
+    fn firstSlotIndex(self: *const @This()) [*]const i64 {
+        const byte_ptr: [*]const u8 = @ptrCast(self);
+        const byte_size = @sizeOf(@This());
+        const last_byte = byte_ptr + byte_size;
+        const flexible_start: [*]const i64 = @ptrCast(@alignCast(last_byte));
+        return flexible_start;
+    }
 };
 
 pub const Instance = opaque {
@@ -129,9 +139,10 @@ pub fn getParam(params: [*]StackSlot, index: c_int) ?*StackSlot {
     }
     @import("std").debug.print("layout {any}\n", .{ layout.* });
 
-    const slot_index: usize = @intCast(index + 1);
-    const first_slot: usize = @intCast(layout.first_slot_index[slot_index]);
-    return &params[first_slot];
+    const slot_offset: usize = @intCast(index + 1);
+    const first_slot_index = layout.firstSlotIndex();
+    const slot_index: usize = @intCast((first_slot_index[slot_offset]));
+    return &params[slot_index];
 }
 
 extern fn umkaAlloc() *Instance;

@@ -31,8 +31,11 @@ pub fn main() !void {
         var calculate: umka.FuncContext = undefined;
         if(instance.getFunc(null, "calculate", &calculate)) {
             
-            var value_param = umka.getParam(calculate.params, 0);
-            value_param.?.int = 5;
+            var a_param = umka.getParam(calculate.params, 0);
+            a_param.?.int = 5;
+
+            var b_param = umka.getParam(calculate.params, 1);
+            b_param.?.int = 7;
 
             if(instance.call(&calculate)) {
                 const result = calculate.result.int;
