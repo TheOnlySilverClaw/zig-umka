@@ -1,6 +1,6 @@
 Zig bindings for the [Umka](https://github.com/vtereshkov/umka-lang) scripting language.
 
-Tested against a built from Commit f43ebf3.
+Tested against a build from Commit f43ebf3.
 
 ## Roadmap
 
