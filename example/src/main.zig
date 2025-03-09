@@ -26,34 +26,37 @@ pub fn main() !void {
         return;
     };
 
-    var sayHello = umka.Function(void).new(null, "sayHello");
+    var sayHello = umka.Function.new(null, "sayHello");
     try sayHello.get(instance);
     try sayHello.call();
 
-    var add = umka.Function(i64).new(null, "add");
+    var add = umka.Function.new(null, "add");
     try add.get(instance);
     try add.setParameter(0, .{ .int = 4 });
     try add.setParameter(1, .{ .int = 6 });
-    const add_result = try add.call();
+    try add.call();
+    const add_result = add.getResult().int;
     print("added: {d}\n", .{ add_result });
 
 
-    var radians = umka.Function(f64).new(null, "radians");
+    var radians = umka.Function.new(null, "radians");
     try radians.get(instance);
     try radians.setParameter(0, .{ .int = 45 });
-    const radians_result = try radians.call();
+    try radians.call();
+    const radians_result = radians.getResult().real;
     print("radians: {d:.5}\n", .{ radians_result });
 
     const Neighbors = extern struct {
         lower: i64,
         higher: i64
     };
-
-    var neighbors = umka.Function(Neighbors).new(null, "neighbors");
+    var neighbors = umka.Function.new(null, "neighbors");
     try neighbors.get(instance);
     try neighbors.setParameter(0, .{ .int = 4 });
-    const neighboes_result = try neighbors.call();
-    print("neighbors: {d} {d}\n", .{ neighboes_result.lower, neighboes_result.higher });
+    var neighbors_result: Neighbors = undefined;
+    neighbors.setResultTarget(&neighbors_result);
+    try neighbors.call();
+    print("neighbors: {d} {d}\n", .{ neighbors_result.lower, neighbors_result.higher });
 }
 
 fn readFileCString(file_name: []const u8, buffer: []u8) ![*:0]u8 {

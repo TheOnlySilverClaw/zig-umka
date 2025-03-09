@@ -81,76 +81,43 @@ pub const Instance = struct {
     }
 };
 
-pub fn Function(R: type) type {
-
-    return struct {
+pub const Function = struct {
         
-        const Self = @This();
-        
-        runtime: *binding.Instance,
-        module: ?[*:0]const u8,
-        name: [*:0]const u8,
-        context: binding.FuncContext,
+    runtime: *binding.Instance,
+    module: ?[*:0]const u8,
+    name: [*:0]const u8,
+    context: binding.FuncContext,
 
-        pub fn new(module: ?[*:0]const u8, name: [*:0]const u8) Self {
-            return .{
-                .runtime = undefined,
-                .module = module,
-                .name = name,
-                .context = undefined
-            };
-        }
+    pub fn new(module: ?[*:0]const u8, name: [*:0]const u8) Function {
+        return .{
+            .runtime = undefined,
+            .module = module,
+            .name = name,
+            .context = undefined
+        };
+    }
 
-        pub fn get(self: *Self, instance: Instance) error{GetFunction}!void {
-            self.runtime = instance.handle;
-            const success = binding.umkaGetFunc(instance.handle, self.module, self.name, &self.context);
-            if(success != 1) return error.GetFunction;
-        }
+    pub fn get(self: *Function, instance: Instance) error{GetFunction}!void {
+        self.runtime = instance.handle;
+        const success = binding.umkaGetFunc(instance.handle, self.module, self.name, &self.context);
+        if(success != 1) return error.GetFunction;
+    }
 
-        pub fn call(self: *Self) error{CallFunction}!R {
-            
-            switch (@typeInfo(R)) {
-                .void => try self.callVoid(),
-                .@"struct", .array => return try self.callMultiReturn(),
-                .int, .float => return try self.callSingleReturn(),
-                else => @compileError("Unsupported return type")
-            }
-        }
+    pub fn getResult(self: *Function) *binding.StackSlot {
+        return binding.getResult(self.context.params, self.context.result);
+    }
 
-        fn callVoid(self: *Self) error{CallFunction}!void {
+    pub fn setResultTarget(self: *Function, target: *anyopaque) void {
+        self.getResult().ptr = @ptrCast(target);
+    }
 
-            const code = binding.umkaCall(self.runtime, &self.context);
-            if(code != 0) return error.CallFunction;
-        }
+    pub fn call(self: *Function) error{CallFunction}!void {
+        const code = binding.umkaCall(self.runtime, &self.context);
+        if(code != 0) return error.CallFunction;
+    }
 
-        fn callSingleReturn(self: *Self) error{CallFunction}!R {
-
-            try self.callVoid();
-
-            const result = binding.getResult(self.context.params, self.context.result);
-            return switch (R) {
-                i64 => result.int,
-                u64 => result.uint,
-                f64 => result.real,
-                f32 => result.real32,
-                else => @compileError("Unsupported return type")
-            };
-        }
-
-        fn callMultiReturn(self: *Self) error{CallFunction}!R {
-
-            var result: R = undefined;
-            var param = binding.getResult(self.context.params, self.context.result);
-            param.ptr = @ptrCast(&result);
-
-            try self.callVoid();
-
-            return result;
-        }
-
-        pub fn setParameter(self: *Self, index: c_int, value: binding.StackSlot) !void {
-            const param = try binding.getParam(self.context.params, index);
-            param.* = value;
-        }
-    };
-}
+    pub fn setParameter(self: *Function, index: c_int, value: binding.StackSlot) !void {
+        const param = try binding.getParam(self.context.params, index);
+        param.* = value;
+    }
+};
