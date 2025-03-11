@@ -33,7 +33,7 @@ pub fn main() !void {
         }
     };
 
-    try instance.addFunction("zigMultiply", &zigMultiply.multiply);
+    try instance.addFunc("zigMultiply", &zigMultiply.multiply);
 
     instance.compile() catch {
         const err = instance.getError();

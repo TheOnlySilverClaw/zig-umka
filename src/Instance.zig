@@ -72,7 +72,7 @@ pub fn addModule(self: Self, file_name: [*:0]const u8, source_string: [*:0]const
     if(success != 1) return error.AddModule;
 }
 
-pub fn addFunction(self: Self, name: [*:0]const u8, function: *const ExternFunc) error{AddFunction}!void {
+pub fn addFunc(self: Self, name: [*:0]const u8, function: *const ExternFunc) error{AddFunction}!void {
     const success = functions.umkaAddFunc(self.handle, name, function);
     if(success != 1) return error.AddFunction;
 }
