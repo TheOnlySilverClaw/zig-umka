@@ -59,8 +59,9 @@ pub const Instance = struct {
         return binding.umkaAlive(self.handle) == 1;
     }
 
-    pub const assembly = binding.umkaAsm;
-
+    pub fn assembly(self: Instance) [*:0]const u8 {
+        return binding.umkaAsm(self.handle);
+    }
     pub fn addModule(self: Instance, file_name: [*:0]const u8, source_string: [*:0]const u8) error{AddModule}!void {
         const success = binding.umkaAddModule(self.handle, file_name, source_string);
         if(success != 1) return error.AddModule;
