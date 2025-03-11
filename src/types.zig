@@ -48,9 +48,9 @@ pub const Error = extern struct {
 pub const WarningCallback = fn(warning: *Error) callconv(.C) void;
 
 pub const ExternalCallParamLayout = extern struct {
-    num_params: i64 align(8) = @import("std").mem.zeroes(i64),
-    num_result_params: i64 = @import("std").mem.zeroes(i64),
-    num_param_slots: i64 = @import("std").mem.zeroes(i64),
+    num_params: i64,
+    num_result_params: i64,
+    num_param_slots: i64,
     
     pub fn firstSlotIndex(self: *const @This()) [*]const i64 {
         const byte_ptr: [*]const u8 = @ptrCast(self);
