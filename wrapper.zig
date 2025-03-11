@@ -72,12 +72,6 @@ pub const Instance = struct {
         if(success != 1) return error.AddFunc;
     }
 
-    pub fn getFunc(self: Instance, module_name: ?[*:0]const u8, fn_name: [*:0]const u8, context: *binding.FuncContext) error{GetFunc}!void {
-
-        const success = binding.umkaGetFunc(self.handle, module_name, fn_name, context);
-        if(success != 1) return error.GetFunc;
-    }
-
     pub fn getError(self: Instance) *binding.Error {
         return binding.umkaGetError(self.handle);
     }
