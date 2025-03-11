@@ -73,11 +73,11 @@ pub fn getParamLayout(params: [*]StackSlot) *const ExternalCallParamLayout {
     return @ptrCast(@alignCast((params - 4)[0].ptr));
 }
 
-pub fn getParam(params: [*]StackSlot, index: c_int) error{InvalidParamIndex}!*StackSlot {
+pub fn getParam(params: [*]StackSlot, index: c_int) ?*StackSlot {
 
     const layout = getParamLayout(params);
     if(index < 0 or index >= layout.num_params - layout.num_result_params - 1) {
-        return error.InvalidParamIndex;
+        return null;
     }
 
     const slot_offset: usize = @intCast(index + 1);

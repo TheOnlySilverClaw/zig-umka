@@ -117,7 +117,7 @@ pub const Function = struct {
     }
 
     pub fn setParameter(self: *Function, index: c_int, value: binding.StackSlot) !void {
-        const param = try binding.getParam(self.context.params, index);
+        const param = binding.getParam(self.context.params, index).?;
         param.* = value;
     }
 
