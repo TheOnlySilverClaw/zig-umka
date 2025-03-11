@@ -11,3 +11,11 @@ fn add(a: int, b: int): int {
 fn neighbors(value: int): (int, int) {
     return value - 1, value + 1
 }
+
+// implemented in Zig
+fn zigMultiply*(a, b: int): int
+
+fn callZig() {
+    value := zigMultiply(1000, 1234)
+    printf("Value from Zig: %d\n", value)
+}

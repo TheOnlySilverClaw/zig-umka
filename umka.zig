@@ -12,7 +12,7 @@ pub const FuncContext = extern struct {
     result: *StackSlot
 };
 
-pub const ExternFunc = fn(params: *StackSlot, result: *StackSlot) callconv(.C) void;
+pub const ExternFunc = fn(params: [*]StackSlot, result: *StackSlot) callconv(.C) void;
 
 pub const HookEvent = enum(c_int) {
     hook_call,
@@ -131,7 +131,7 @@ pub extern fn umkaAsm(umka: *Instance) [*:0]const u8;
 
 pub extern fn umkaAddModule(umka: *Instance, file_name: [*:0]const u8, source_string: [*:0]const u8) c_char;
 
-pub extern fn umkaAddFunc(umka: *Instance, name: [*:0]const u8, func: ExternFunc) c_char;
+pub extern fn umkaAddFunc(umka: *Instance, name: [*:0]const u8, func: *const ExternFunc) c_char;
 
 pub extern fn umkaGetFunc(umka: *Instance, module_name: ?[*:0]const u8, fn_name: [*:0]const u8, context: *FuncContext) c_char;
 

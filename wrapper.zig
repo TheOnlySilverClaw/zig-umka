@@ -1,6 +1,7 @@
 const binding = @import("umka.zig");
 const assert = @import("std").debug.assert;
 
+pub const StackSlot = binding.StackSlot;
 
 pub const getVersion = binding.umkaGetVersion;
 
@@ -67,9 +68,9 @@ pub const Instance = struct {
         if(success != 1) return error.AddModule;
     }
 
-    pub fn addFunc(self: Instance, name: [*:0]const u8, func: binding.ExternFunc) error{AddFunc}!void {
-        const success = binding.umkaAddFunc(self.handle, name, func);
-        if(success != 1) return error.AddFunc;
+    pub fn addFunction(self: Instance, name: [*:0]const u8, function: *const binding.ExternFunc) error{AddFunction}!void {
+        const success = binding.umkaAddFunc(self.handle, name, function);
+        if(success != 1) return error.AddFunction;
     }
 
     pub fn getError(self: Instance) *binding.Error {

@@ -25,6 +25,16 @@ pub fn main() !void {
     const module_source = try readFileCString(module_file_name, &module_buffer);
     try instance.addModule(module_file_name, module_source);
 
+    const zigMultiply = struct {
+        fn multiply(params: [*]umka.StackSlot, result: *umka.StackSlot) callconv(.C) void {
+            const a = params[0].int;
+            const b = params[1].int;
+            result.int = a * b;
+        }
+    };
+
+    try instance.addFunction("zigMultiply", &zigMultiply.multiply);
+
     instance.compile() catch {
         const err = instance.getError();
         print("failed to compile file {s} function {s} line {d} position {d}: {s}\n", .{ err.file_name, err.fn_name, err.line, err.pos, err.msg });
@@ -65,6 +75,10 @@ pub fn main() !void {
     neighbors.setResultTarget(&neighbors_result);
     try neighbors.call();
     print("neighbors: {d} {d}\n", .{ neighbors_result.lower, neighbors_result.higher });
+
+    var call_zig = umka.Function.new(null, "callZig");
+    try call_zig.get(instance);
+    try call_zig.call();
 }
 
 fn readFileCString(file_name: []const u8, buffer: []u8) ![*:0]u8 {
