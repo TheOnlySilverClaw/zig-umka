@@ -34,7 +34,7 @@ pub fn main() !void {
     try add.get(instance);
     try add.setParameters(&.{ .{ .int = 4 }, .{ .int = 6 } });
     try add.call();
-    try add.setParameter(0, add.getResult().*);
+    add.getParameter(0).int = add.getResult().int;
     try add.call();
     print("added: {d}\n", .{ add.getResult().int });
 
@@ -43,7 +43,7 @@ pub fn main() !void {
     const degree_step = 45;
     for(0..(360 / degree_step) + 1) |index| {
         const degrees: i64 = @intCast(index * degree_step);
-        try radians.setParameter(0, .{ .int = degrees });
+        radians.getParameter(0).int = degrees;
         try radians.call();
         print("{d:>4} deg = {d:.3} rad\n", .{ degrees, radians.getResult().real });
     }
@@ -54,7 +54,7 @@ pub fn main() !void {
     };
     var neighbors = umka.Function.new(null, "neighbors");
     try neighbors.get(instance);
-    try neighbors.setParameter(0, .{ .int = 4 });
+    neighbors.getParameter(0).int = 4;
     var neighbors_result: Neighbors = undefined;
     neighbors.setResultTarget(&neighbors_result);
     try neighbors.call();
