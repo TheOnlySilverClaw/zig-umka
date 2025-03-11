@@ -32,7 +32,7 @@ pub fn main() !void {
 
     var add = umka.Function.new(null, "add");
     try add.get(instance);
-    try add.setParameters(&.{ .{ .int = 4 }, .{ .int = 6 } });
+    add.setParameters(&.{ .{ .int = 4 }, .{ .int = 6 } });
     try add.call();
     add.getParameter(0).int = add.getResult().int;
     try add.call();
