@@ -1,0 +1,5 @@
+import "std.um"
+
+fn radians*(degrees: int): real {
+    return degrees * std::pi / 180
+}

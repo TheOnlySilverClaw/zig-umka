@@ -17,8 +17,13 @@ pub fn main() !void {
     const stack_size = 1024 * 4;
     const instance = try umka.Instance.alloc(file_name, source, stack_size, &.{}, true, true, null);
     defer instance.free();
-    
+        
     assert(instance.alive());
+
+    var module_buffer: [256]u8 = undefined;
+    const module_file_name = "module.um";
+    const module_source = try readFileCString(module_file_name, &module_buffer);
+    try instance.addModule(module_file_name, module_source);
 
     instance.compile() catch {
         const err = instance.getError();
@@ -38,7 +43,7 @@ pub fn main() !void {
     try add.call();
     print("added: {d}\n", .{ add.getResult().int });
 
-    var radians = umka.Function.new(null, "radians");
+    var radians = umka.Function.new(module_file_name, "radians");
     try radians.get(instance);
     const degree_step = 45;
     var degree_param = radians.getParameter(0);

@@ -1,4 +1,4 @@
-import "std.um"
+import "module.um"
 
 fn sayHello() {
     printf("Hello from Umka!\n")
@@ -6,10 +6,6 @@ fn sayHello() {
 
 fn add(a: int, b: int): int {
     return a + b
-}
-
-fn radians(degrees: int): real {
-    return degrees * std::pi / 180
 }
 
 fn neighbors(value: int): (int, int) {
