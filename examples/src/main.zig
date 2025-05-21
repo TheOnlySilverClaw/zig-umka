@@ -76,10 +76,17 @@ pub fn main() !void {
     try call_zig.call();
 
     const memory = try instance.allocData(1024 * 4, null);
+    memory.incRef();
+    memory.decRef();
     memory.decRef();
 
-    const string = try instance.makeStr("Here's a nice string for you!");
-    print("string length: {d}\n", .{ string.len() });
+    var greeting = try instance.getFunc(null, "greeting");
+    const name_string = try instance.makeStr("jolly good fellow");
+    greeting.getParameter(0).ptr = name_string.ptr;
+    try greeting.call();
+    const greeting_string = greeting.getResult().str();
+
+    print("greeting: \"{s}\" (length: {d})\n", .{ greeting_string.slice(), greeting_string.len() });
 
     print("Memory usage: {d} bytes\n", .{ instance.getMemUsage() });
 

@@ -8,7 +8,11 @@ pub const StackSlot = extern union {
     uint: u64,
     ptr: *anyopaque,
     real: f64,
-    real32: f32
+    real32: f32,
+
+    pub fn str(self: StackSlot) String {
+        return String { .ptr = @ptrCast(self.ptr) };
+    }
 };
 
 pub const FuncContext = extern struct {
@@ -42,6 +46,12 @@ pub const String = struct {
 
     pub fn len(self: String) c_int {
         return functions.umkaGetStrLen(self.ptr);
+    }
+
+    /// convencience method to view as a Zig slice of UTF-8 bytes
+    pub fn slice(self: String) []const u8 {
+        const length: usize = @intCast(self.len());
+        return self.ptr[0..length];
     }
 };
 
