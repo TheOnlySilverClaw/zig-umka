@@ -2,7 +2,7 @@ const types = @import("types.zig");
 
 const Error = types.Error;
 const WarningCallback = types.WarningCallback;
-const Memory = @import("Memory.zig");
+const Memory = types.Memory;
 const StackSlot = types.StackSlot;
 const Type = types.Type;
 const Map = types.Map;
@@ -124,10 +124,6 @@ pub fn allocData(self: Self, size: c_int, on_free: ?*const ExternFunc) error{All
             .ptr = data
         };
     } else return error.AllocData;
-}
-
-pub fn getMapItem(self: Self, map: *Map, key: StackSlot) ?*Map.Item {
-    return functions.umkaGetMapItem(self.handle, map, key);
 }
 
 pub fn makeStr(self: Self, data: [*:0]const u8) error{MakeStr}!String {

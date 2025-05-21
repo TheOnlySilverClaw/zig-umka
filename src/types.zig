@@ -1,5 +1,8 @@
 const functions = @import("functions.zig");
 
+// internal Umka instance handle
+const Instance = anyopaque;
+
 pub const StackSlot = extern union {
     int: i64,
     uint: u64,
@@ -23,8 +26,15 @@ pub const HookEvent = enum(c_int) {
 
 pub const HookFunc = fn(file_name: [*:0]const u8, func_name: [*:0]const u8, line: c_int) callconv(.C) void;
 
-pub const Map = opaque {
+pub const Map = struct {
+    instance: *anyopaque,
+    ptr: *anyopaque,
+
     pub const Item = anyopaque;
+
+    pub fn getItem(self: Map, key: *StackSlot) ?*Item {
+        return functions.umkaGetMapItem(self.instance, self.ptr, key);
+    }
 };
 
 pub const String = struct {
@@ -39,7 +49,7 @@ pub const Type = anyopaque;
 
 pub const Any = extern struct {
     data: *anyopaque,
-    type: *anyopaque
+    umka_type: *Type
 };
 
 pub const DynArray = struct {
@@ -49,6 +59,20 @@ pub const DynArray = struct {
         return functions.umkaGetDynArrayLen(self.ptr);
     }
 };
+
+pub const Memory = struct {
+    instance: *Instance,
+    ptr: *anyopaque,
+
+    pub fn incRef(self: Memory) void {
+        functions.umkaIncRef(self.instance, self.ptr);
+    }
+
+    pub fn decRef(self: Memory) void {
+        functions.umkaDecRef(self.instance, self.ptr);
+    }
+};
+
 
 pub const Closure = extern struct {
     entry_offset: i64,
