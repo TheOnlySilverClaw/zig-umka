@@ -23,10 +23,7 @@ pub const HookEvent = enum(c_int) {
 
 pub const HookFunc = fn(file_name: [*:0]const u8, func_name: [*:0]const u8, line: c_int) callconv(.C) void;
 
-pub const Map = extern struct {
-    internal1: *anyopaque,
-    internal2: *anyopaque,
-
+pub const Map = opaque {
     pub const Item = anyopaque;
 };
 
