@@ -1,3 +1,5 @@
+const functions = @import("functions.zig");
+
 pub const StackSlot = extern union {
     int: i64,
     uint: u64,
@@ -23,12 +25,32 @@ pub const HookFunc = fn(file_name: [*:0]const u8, func_name: [*:0]const u8, line
 
 pub const Map = extern struct {
     internal1: *anyopaque,
-    internal2: *anyopaque
+    internal2: *anyopaque,
+
+    pub const Item = anyopaque;
 };
+
+pub const String = struct {
+    ptr: [*]u8,
+
+    pub fn len(self: String) c_int {
+        return functions.umkaGetStrLen(self.ptr);
+    }
+};
+
+pub const Type = anyopaque;
 
 pub const Any = extern struct {
     data: *anyopaque,
     type: *anyopaque
+};
+
+pub const DynArray = struct {
+    ptr: [*]const anyopaque,
+
+    pub fn len(self: DynArray) c_int {
+        return functions.umkaGetDynArrayLen(self.ptr);
+    }
 };
 
 pub const Closure = extern struct {

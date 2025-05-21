@@ -13,6 +13,7 @@ const HookEvent = types.HookEvent;
 const HookFunc = types.HookFunc;
 
 const Instance = anyopaque;
+const Memory = anyopaque;
 
 pub extern fn umkaAlloc() ?*Instance;
 
@@ -51,21 +52,21 @@ pub extern fn umkaGetFunc(umka: *Instance, module_name: ?[*:0]const u8, fn_name:
 
 pub extern fn umkaGetCallStack(umka: *Instance, depth: c_int, name_size: c_int, offset: *c_int, file_name: [*]u8, fn_name: [*]u8, line: *c_int) c_char;
 
-pub extern fn umkaSetHook(umka: *Instance, event: HookEvent, hook: HookFunc) void;
+pub extern fn umkaSetHook(umka: *Instance, event: HookEvent, hook: *const HookFunc) void;
 
-pub extern fn umkaAllocData(umka: *Instance, size: c_int, on_free: ExternFunc) *anyopaque;
+pub extern fn umkaAllocData(umka: *Instance, size: c_int, on_free: ?*const ExternFunc) ?*Memory;
 
-pub extern fn umkaIncRef(umka: *Instance, ptr: *anyopaque) void;
+pub extern fn umkaIncRef(umka: *Instance, ptr: *Memory) void;
 
-pub extern fn umkaDecRef(umka: *Instance, ptr: *anyopaque) void;
+pub extern fn umkaDecRef(umka: *Instance, ptr: *Memory) void;
 
 pub extern fn umkaGetMapItem(umka: *Instance, map: *Map, key: StackSlot) *anyopaque;
 
-pub extern fn umkaMakeStr(umka: *Instance, str: [*:0]const u8) [*]u8;
+pub extern fn umkaMakeStr(umka: *Instance, str: [*:0]const u8) ?[*]u8;
 
 pub extern fn umkaGetStrLen(str: [*]const u8) c_int;
 
-pub extern fn umkaMakeDynArray(umka: *Instance, array: [*]anyopaque, type: *anyopaque, len: c_int) void;
+pub extern fn umkaMakeDynArray(umka: *Instance, array: [*]anyopaque, umka_type: *anyopaque, len: c_int) void;
 
 pub extern fn umkaGetDynArrayLen(array: [*]const anyopaque) c_int;
 

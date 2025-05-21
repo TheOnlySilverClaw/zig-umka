@@ -74,6 +74,15 @@ pub fn main() !void {
 
     var call_zig = try instance.getFunc(null, "callZig");
     try call_zig.call();
+
+    const memory = try instance.allocData(1024 * 4, null);
+    memory.decRef();
+
+    const string = try instance.makeStr("Here's a nice string for you!");
+    print("string length: {d}\n", .{ string.len() });
+
+    print("Memory usage: {d} bytes\n", .{ instance.getMemUsage() });
+
 }
 
 fn readFileCString(file_name: []const u8, buffer: []u8) ![*:0]u8 {
