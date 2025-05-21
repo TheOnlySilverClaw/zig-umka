@@ -14,7 +14,7 @@ const HookFunc = types.HookFunc;
 
 const Instance = anyopaque;
 
-pub extern fn umkaAlloc() *Instance;
+pub extern fn umkaAlloc() ?*Instance;
 
 pub extern fn umkaInit(
     umka: *Instance,

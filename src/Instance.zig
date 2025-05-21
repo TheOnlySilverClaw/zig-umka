@@ -14,19 +14,24 @@ const Self = @This();
 // internal Umka instance handle
 handle: *anyopaque,
 
-pub fn alloc(
+pub fn alloc() error{Alloc}!Self {
+
+    if(functions.umkaAlloc()) |handle| {
+        return .{ .handle = handle };
+    } else return error.Alloc;
+}
+
+pub fn init(self: Self,
     file_name: ?[*:0]const u8,
     source_string: ?[*:0]const u8,
     stack_size: c_int,
     args: [][*:0]const u8,
     file_system_enabled: bool,
     impl_libs_enabled: bool,
-    warning_callback: ?*WarningCallback) error{Init}!Self {
+    warning_callback: ?*WarningCallback) error{Init}!void {
     
-    const handle = functions.umkaAlloc();
-
     const success = functions.umkaInit(
-        handle,
+        self.handle,
         file_name,
         source_string,
         stack_size,
@@ -38,8 +43,6 @@ pub fn alloc(
         warning_callback);
 
     if(success != 1) return error.Init;
-
-    return .{ .handle = handle };
 }
 
 pub fn free(self: Self) void {
