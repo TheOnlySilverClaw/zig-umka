@@ -14,9 +14,8 @@ pub fn main() !void {
     var buffer: [1024]u8 = undefined;
     const source = try readFileCString(file_name, &buffer);
     
-    const stack_size = 1024 * 4;
     const instance = try umka.Instance.alloc();
-    try instance.init(file_name, source, stack_size, &.{}, true, true, null);
+    try instance.init(file_name, source, .{});
     defer instance.free();
         
     assert(instance.alive());

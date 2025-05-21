@@ -11,6 +11,14 @@ const functions = @import("functions.zig");
 
 const Self = @This();
 
+pub const Options = struct {
+    stack_size: c_int = 1024 * 1024,
+    args: [][*:0]const u8 = &.{},
+    file_system_enabled: bool = true,
+    impl_libs_enabled: bool = true,
+    warning_callback: ?*WarningCallback = null
+};
+
 // internal Umka instance handle
 handle: *anyopaque,
 
@@ -21,26 +29,19 @@ pub fn alloc() error{Alloc}!Self {
     } else return error.Alloc;
 }
 
-pub fn init(self: Self,
-    file_name: ?[*:0]const u8,
-    source_string: ?[*:0]const u8,
-    stack_size: c_int,
-    args: [][*:0]const u8,
-    file_system_enabled: bool,
-    impl_libs_enabled: bool,
-    warning_callback: ?*WarningCallback) error{Init}!void {
+pub fn init(self: Self, file_name: ?[*:0]const u8, source_string: ?[*:0]const u8, options: Options) error{Init}!void {
     
     const success = functions.umkaInit(
         self.handle,
         file_name,
         source_string,
-        stack_size,
+        options.stack_size,
         null,
-        @intCast(args.len),
-        args.ptr,
-        if(file_system_enabled) 1 else 0,
-        if(impl_libs_enabled) 1 else 0,
-        warning_callback);
+        @intCast(options.args.len),
+        options.args.ptr,
+        if(options.file_system_enabled) 1 else 0,
+        if(options.impl_libs_enabled) 1 else 0,
+        options.warning_callback);
 
     if(success != 1) return error.Init;
 }
