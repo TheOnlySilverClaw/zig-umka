@@ -41,20 +41,17 @@ pub fn main() !void {
         return;
     };
 
-    var sayHello = umka.Function.new(null, "sayHello");
-    try sayHello.get(instance);
+    var sayHello = try instance.getFunc(null, "sayHello");
     try sayHello.call();
 
-    var add = umka.Function.new(null, "add");
-    try add.get(instance);
+    var add = try instance.getFunc(null, "add");
     add.setParameters(&.{ .{ .int = 4 }, .{ .int = 6 } });
     try add.call();
     add.getParameter(0).int = add.getResult().int;
     try add.call();
     print("added: {d}\n", .{ add.getResult().int });
 
-    var radians = umka.Function.new(module_file_name, "radians");
-    try radians.get(instance);
+    var radians = try instance.getFunc(module_file_name, "radians");
     const degree_step = 45;
     var degree_param = radians.getParameter(0);
     for(0..(360 / degree_step) + 1) |index| {
@@ -68,16 +65,14 @@ pub fn main() !void {
         lower: i64,
         higher: i64
     };
-    var neighbors = umka.Function.new(null, "neighbors");
-    try neighbors.get(instance);
+    var neighbors = try instance.getFunc(null, "neighbors");
     neighbors.getParameter(0).int = 4;
     var neighbors_result: Neighbors = undefined;
     neighbors.setResultTarget(&neighbors_result);
     try neighbors.call();
     print("neighbors: {d} {d}\n", .{ neighbors_result.lower, neighbors_result.higher });
 
-    var call_zig = umka.Function.new(null, "callZig");
-    try call_zig.get(instance);
+    var call_zig = try instance.getFunc(null, "callZig");
     try call_zig.call();
 }
 

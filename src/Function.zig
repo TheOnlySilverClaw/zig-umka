@@ -13,24 +13,7 @@ const Self = @This();
 
 // internal Umka instance handle
 instance: *anyopaque,
-module: ?[*:0]const u8,
-name: [*:0]const u8,
 context: FuncContext,
-
-pub fn new(module: ?[*:0]const u8, name: [*:0]const u8) Self {
-    return .{
-        .instance = undefined,
-        .module = module,
-        .name = name,
-        .context = undefined
-    };
-}
-
-pub fn get(self: *Self, instance: Instance) error{GetFunction}!void {
-    self.instance = instance.handle;
-    const success = functions.umkaGetFunc(instance.handle, self.module, self.name, &self.context);
-    if(success != 1) return error.GetFunction;
-}
 
 pub fn getResult(self: *Self) *StackSlot {
     return stack.getResult(self.context.params, self.context.result);

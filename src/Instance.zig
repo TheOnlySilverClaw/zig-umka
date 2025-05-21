@@ -5,6 +5,7 @@ const WarningCallback = types.WarningCallback;
 
 const ExternFunc = types.ExternFunc;
 const FuncContext = types.FuncContext;
+const Function = @import("Function.zig");
 
 const functions = @import("functions.zig");
 
@@ -72,9 +73,21 @@ pub fn addModule(self: Self, file_name: [*:0]const u8, source_string: [*:0]const
     if(success != 1) return error.AddModule;
 }
 
-pub fn addFunc(self: Self, name: [*:0]const u8, function: *const ExternFunc) error{AddFunction}!void {
+pub fn addFunc(self: Self, name: [*:0]const u8, function: *const ExternFunc) error{AddFunc}!void {
     const success = functions.umkaAddFunc(self.handle, name, function);
-    if(success != 1) return error.AddFunction;
+    if(success != 1) return error.AddFunc;
+}
+
+pub fn getFunc(self: *const Self, module: ?[*:0]const u8, name: [*:0]const u8) error{GetFunc} !Function {
+    
+    var func = Function {
+        .instance = self.handle,
+        .context = undefined
+    };
+
+    const success = functions.umkaGetFunc(func.instance, module, name, &func.context);
+    if(success != 1) return error.GetFunc;
+    return func;
 }
 
 pub fn getError(self: Self) *Error {
