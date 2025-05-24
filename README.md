@@ -17,8 +17,9 @@ exe_module.addImport("umka", umka_dependency.module("binding"));
 exe_module.addImport("umka", umka_dependency.module("wrapper"));
 ```
 
-This project only provides the bindings!
-You have to build and link Umka as a static libary.
+This project only provides the bindings!  
+You have to link Umka as a static libary.  
+Get it from the official release or build from source.
 
 Build configuration and further examples can be found under [examples](/examples).
 
