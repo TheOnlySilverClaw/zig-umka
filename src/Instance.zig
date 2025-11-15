@@ -94,7 +94,7 @@ pub fn addFunc(self: Self, name: [*:0]const u8, function: *const ExternFunc) err
     if(success != 1) return error.AddFunc;
 }
 
-pub fn getFunc(self: *const Self, module: ?[*:0]const u8, name: [*:0]const u8) error{GetFunc} !Function {
+pub fn getFunc(self: *const Self, module: ?[*:0]const u8, name: [*:0]const u8) ?Function {
     
     var func = Function {
         .instance = self.handle,
@@ -102,7 +102,7 @@ pub fn getFunc(self: *const Self, module: ?[*:0]const u8, name: [*:0]const u8) e
     };
 
     const success = functions.umkaGetFunc(func.instance, module, name, &func.context);
-    if(success != 1) return error.GetFunc;
+    if(success != 1) return null;
     return func;
 }
 
@@ -134,10 +134,10 @@ pub fn makeStr(self: Self, data: [*:0]const u8) error{MakeStr}!String {
 }
 
 // TODO error handling possible?
-pub fn makeDynArray(self: Self, umka_type: *Type, len: c_int) DynArray {
+pub fn makeDynArray(self: Self, zig_zype: type, umka_type: *Type, len: c_int) DynArray(zig_zype) {
     
-    const array = DynArray { .ptr = undefined };
-    functions.umkaMakeDynArray(self.handle, array.ptr, umka_type, len);
+    const array: DynArray(zig_zype) = undefined;
+    functions.umkaMakeDynArray(self.handle, &array, umka_type, len);
     return array;
 }
 

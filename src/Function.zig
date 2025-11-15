@@ -1,6 +1,5 @@
 const types = @import("types.zig");
 const functions = @import("functions.zig");
-const stack = @import("stack.zig");
 
 const FuncContext = types.FuncContext;
 const StackSlot = types.StackSlot;
@@ -15,11 +14,11 @@ const Self = @This();
 instance: *anyopaque,
 context: FuncContext,
 
-pub fn getResult(self: *Self) *StackSlot {
-    return stack.getResult(self.context.params, self.context.result);
+pub fn getResult(self: Self) *StackSlot {
+    return functions.umkaGetResult(self.context.params, self.context.result);
 }
 
-pub fn setResultTarget(self: *Self, target: *anyopaque) void {
+pub fn setResultTarget(self: Self, target: *anyopaque) void {
     self.getResult().ptr = @ptrCast(target);
 }
 
@@ -29,18 +28,5 @@ pub fn call(self: *Self) error{CallFunction}!void {
 }
 
 pub fn getParameter(self: *Self, index: i32) *StackSlot {
-    return stack.getParam(self.context.params, index).?;
-}
-
-pub fn setParameters(self: *Self, values: []const StackSlot) void {
-
-    const params = self.context.params;
-    const layout = stack.getParamLayout(params);
-    assert(values.len <= layout.num_params - layout.num_result_params - 1);
-    
-    const first_slot_index = layout.firstSlotIndex();
-    for(0..values.len) |index| {
-        const slot_index: usize = @intCast(first_slot_index[index + 1]);
-        params[slot_index] = values[index];
-    }
+    return functions.umkaGetParam(self.context.params, index);
 }

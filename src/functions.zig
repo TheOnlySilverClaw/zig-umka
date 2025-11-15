@@ -8,12 +8,16 @@ const ExternFunc = types.ExternFunc;
 
 const Map = types.Map;
 const StackSlot = types.StackSlot;
+const Any = types.Any;
 
 const HookEvent = types.HookEvent;
 const HookFunc = types.HookFunc;
 
 const Instance = anyopaque;
 const Memory = anyopaque;
+
+const Metadata = types.Metadata;
+
 
 pub extern fn umkaAlloc() ?*Instance;
 
@@ -75,3 +79,13 @@ pub extern fn umkaGetVersion() [*:0]const u8;
 pub extern fn umkaGetMemUsage(umka: *Instance) i64;
 
 pub extern fn umkaMakeFuncContext(umka: *Instance, closure_type: *anyopaque, entry_offset: c_int, context: FuncContext) void;
+
+pub extern fn umkaGetParam(params: [*]StackSlot, index: c_int) *StackSlot;
+
+pub extern fn umkaGetUpvalue(params: [*]StackSlot) *Any;
+
+pub extern fn umkaGetResult(params: [*]StackSlot, result: *StackSlot) *StackSlot;
+
+pub extern fn umkaGetMetadata(umka: *Instance) *Metadata;
+
+pub extern fn umkaSetMetadata(umka: *Instance, metadata: *Metadata) void;

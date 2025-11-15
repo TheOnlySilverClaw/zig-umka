@@ -21,14 +21,28 @@ pub const FuncContext = extern struct {
     result: *StackSlot
 };
 
-pub const ExternFunc = fn(params: [*]StackSlot, result: *StackSlot) callconv(.C) void;
+pub const ExternFunc = fn(params: [*]StackSlot, result: *StackSlot) callconv(.c) void;
 
 pub const HookEvent = enum(c_int) {
     hook_call,
     hook_return
 };
 
-pub const HookFunc = fn(file_name: [*:0]const u8, func_name: [*:0]const u8, line: c_int) callconv(.C) void;
+pub const HookFunc = fn(file_name: [*:0]const u8, func_name: [*:0]const u8, line: c_int) callconv(.c) void;
+
+pub fn DynArray(T: type) type {
+    return {
+        struct {
+            _internal: *anyopaque,
+            item_size: i64,
+            data: [*]T,
+
+            pub fn len(self: DynArray) c_int {
+                return functions.umkaGetDynArrayLen(self.ptr);
+            }
+        };
+    };
+}
 
 pub const Map = struct {
     instance: *anyopaque,
@@ -62,14 +76,6 @@ pub const Any = extern struct {
     umka_type: *Type
 };
 
-pub const DynArray = struct {
-    ptr: [*]const anyopaque,
-
-    pub fn len(self: DynArray) c_int {
-        return functions.umkaGetDynArrayLen(self.ptr);
-    }
-};
-
 pub const Memory = struct {
     instance: *Instance,
     ptr: *anyopaque,
@@ -98,7 +104,7 @@ pub const Error = extern struct {
     msg: [*:0]const u8
 };
 
-pub const WarningCallback = fn(warning: *Error) callconv(.C) void;
+pub const WarningCallback = fn(warning: *Error) callconv(.c) void;
 
 pub const ExternalCallParamLayout = extern struct {
     num_params: i64,
@@ -113,3 +119,5 @@ pub const ExternalCallParamLayout = extern struct {
         return flexible_start;
     }
 };
+
+pub const Metadata = anyopaque;

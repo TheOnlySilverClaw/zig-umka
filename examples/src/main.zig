@@ -1,14 +1,13 @@
 const std = @import("std");
-const debug = std.debug;
+const log = std.log;
 const fs = std.fs;
 const umka = @import("umka");
 
-const print = debug.print;
-const assert = debug.assert;
+const assert = std.debug.assert;
 
 pub fn main() !void {
 
-    print("Umka version: {s}\n", .{ umka.getVersion() });
+    log.info("Umka version: {s}", .{ umka.getVersion() });
 
     const file_name = "test.um";
     var buffer: [1024]u8 = undefined;
@@ -17,7 +16,7 @@ pub fn main() !void {
     const instance = try umka.Instance.alloc();
     try instance.init(file_name, source, .{});
     defer instance.free();
-        
+    
     assert(instance.alive());
 
     var module_buffer: [256]u8 = undefined;
@@ -25,8 +24,10 @@ pub fn main() !void {
     const module_source = try readFileCString(module_file_name, &module_buffer);
     try instance.addModule(module_file_name, module_source);
 
+    log.debug("Added module source", .{});
+
     const zigMultiply = struct {
-        fn multiply(params: [*]umka.StackSlot, result: *umka.StackSlot) callconv(.C) void {
+        fn multiply(params: [*]umka.StackSlot, result: *umka.StackSlot) callconv(.c) void {
             const a = params[0].int;
             const b = params[1].int;
             result.int = a * b;
@@ -37,42 +38,67 @@ pub fn main() !void {
 
     instance.compile() catch {
         const err = instance.getError();
-        print("failed to compile file {s} function {s} line {d} position {d}: {s}\n", .{ err.file_name, err.fn_name, err.line, err.pos, err.msg });
+        log.err("Failed to compile file {s} function {s} line {d} position {d}: {s}", .{ err.file_name, err.fn_name, err.line, err.pos, err.msg });
         return;
     };
 
-    var sayHello = try instance.getFunc(null, "sayHello");
+    log.debug("Compiled module successfully", .{});
+
+    var sayHello = instance.getFunc(null, "sayHello") orelse {
+        log.warn("Could not find function 'sayHello'", .{});
+        return;
+    };
+
     try sayHello.call();
 
-    var add = try instance.getFunc(null, "add");
-    add.setParameters(&.{ .{ .int = 4 }, .{ .int = 6 } });
+    var add = instance.getFunc(null, "add") orelse {
+        log.warn("Could not find function 'add'", .{});
+        return;
+    };
+
+    add.getParameter(0).int = 4;
+    add.getParameter(1).int = 6;
+
     try add.call();
     add.getParameter(0).int = add.getResult().int;
     try add.call();
-    print("added: {d}\n", .{ add.getResult().int });
+    log.debug("Added: {d}", .{ add.getResult().int });
 
-    var radians = try instance.getFunc(module_file_name, "radians");
+    var radians = instance.getFunc(module_file_name, "radians") orelse {
+        log.warn("Could not find function 'radians'", .{});
+        return;
+    };
+
     const degree_step = 45;
     var degree_param = radians.getParameter(0);
     for(0..(360 / degree_step) + 1) |index| {
         const degrees: i64 = @intCast(index * degree_step);
         degree_param.int = degrees;
         try radians.call();
-        print("{d:>4} deg = {d:.3} rad\n", .{ degrees, radians.getResult().real });
+        log.debug("{d:>4} deg = {d:.3} rad", .{ degrees, radians.getResult().real });
     }
+    
 
     const Neighbors = extern struct {
         lower: i64,
         higher: i64
     };
-    var neighbors = try instance.getFunc(null, "neighbors");
+    
+    var neighbors = instance.getFunc(null, "neighbors") orelse {
+        log.warn("Could not find function 'neighbors'", .{});
+        return;
+    };
+
     neighbors.getParameter(0).int = 4;
     var neighbors_result: Neighbors = undefined;
     neighbors.setResultTarget(&neighbors_result);
     try neighbors.call();
-    print("neighbors: {d} {d}\n", .{ neighbors_result.lower, neighbors_result.higher });
+    log.debug("neighbors: {d} {d}", .{ neighbors_result.lower, neighbors_result.higher });
 
-    var call_zig = try instance.getFunc(null, "callZig");
+    var call_zig = instance.getFunc(null, "callZig") orelse {
+        log.warn("Could not find function 'callZig'", .{});
+        return;
+    };
     try call_zig.call();
 
     const memory = try instance.allocData(1024 * 4, null);
@@ -80,15 +106,18 @@ pub fn main() !void {
     memory.decRef();
     memory.decRef();
 
-    var greeting = try instance.getFunc(null, "greeting");
+    var greeting = instance.getFunc(null, "greeting") orelse {
+        log.warn("Could not find function 'greeting'", .{});
+        return;
+    };
     const name_string = try instance.makeStr("jolly good fellow");
     greeting.getParameter(0).ptr = name_string.ptr;
     try greeting.call();
     const greeting_string = greeting.getResult().str();
+    log.debug("greeting: \"{s}\" (length: {d})", .{ greeting_string.slice(), greeting_string.len() });
 
-    print("greeting: \"{s}\" (length: {d})\n", .{ greeting_string.slice(), greeting_string.len() });
 
-    print("Memory usage: {d} bytes\n", .{ instance.getMemUsage() });
+    log.info("Memory usage: {d} bytes", .{ instance.getMemUsage() });
 
 }
 

@@ -1,3 +1,3 @@
-pub usingnamespace @import("types.zig");
-pub usingnamespace @import("functions.zig");
-pub usingnamespace @import("stack.zig");
+pub const types = @import("types.zig");
+pub const functions = @import("functions.zig");
+pub const stack = @import("stack.zig");
